@@ -1,0 +1,75 @@
+1°
+CREATE PROCEDURE RegistrarAtendimento
+(
+    @crm_medico BIGINT,
+    @cofen_enfermeiro BIGINT,
+    @id_bebe INT
+)
+AS
+BEGIN
+    INSERT INTO atendido (crm, cofen, idbebe_hospital) VALUES (@crm_medico, @cofen_enfermeiro, @id_bebe)
+END
+
+Registrar Atendimento: Este procedure registra o atendimento de um bebê por um médico e um enfermeiro.
+
+2°
+CREATE PROCEDURE BuscarBebePorNome
+(
+    @nome_bebe VARCHAR(255)
+)
+AS
+BEGIN
+    SELECT * FROM bebe WHERE nome = @nome_bebe
+END
+
+Buscar Bebê por Nome: Esta procedure retorna informações sobre um bebê com base no nome fornecido.
+
+3°
+CREATE PROCEDURE BuscarBebePorHospital
+(
+    @nome_hospital VARCHAR(255)
+)
+AS
+BEGIN
+    SELECT b.* 
+    FROM bebe b
+    INNER JOIN atendido a ON b.idbebe_hospital = a.idbebe_hospital
+    INNER JOIN hospital h ON b.idbebe_hospital = h.cnpj
+    WHERE h.nome = @nome_hospital
+END
+
+Buscar bebês atendidos em determinado hospital: Esta procedure retorna informações sobre bebês que foram atendidos em um determinado hosptal.
+
+
+
+4°
+CREATE PROCEDURE BuscarBebePorMedico
+(
+    @nome_medico VARCHAR(255)
+)
+AS
+BEGIN
+    SELECT b.* 
+    FROM bebe b
+    INNER JOIN atendido a ON b.idbebe_hospital = a.idbebe_hospital
+    INNER JOIN medico m ON a.crm = m.crm
+    WHERE m.nome = @nome_medico
+END
+
+Buscar bebês atendidos por um determinado médico: Esta procedure retorna informações sobre bebês que foram atendidos por um determinado médico. 
+
+5°
+CREATE PROCEDURE BuscarBebePorCpfMae
+(
+    @cpf_mae BIGINT
+)
+AS
+BEGIN
+    SELECT b.* 
+    FROM bebe b
+    INNER JOIN possui p ON b.idbebe_hospital = p.idbebe_hospital
+    INNER JOIN mae m ON p.idmae = m.idmae
+    WHERE m.cpf = @cpf_mae
+END
+
+Buscar bebê por cpf da mãe: Esta procedure retorna informações sobre um bebê com base no CPF da mãe. 
