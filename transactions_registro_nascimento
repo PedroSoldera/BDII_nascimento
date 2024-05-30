@@ -1,0 +1,117 @@
+BEGIN TRANSACTION
+
+BEGIN TRY
+    -- Inserir atendimento na tabela atendido
+    INSERT INTO atendido (crm, cofen, idbebe_hospital)
+    VALUES (123456, 789012, 31)
+
+    -- Atualizar a tabela bebe com informações adicionais, se necessário
+    UPDATE bebe
+    SET peso = 3.40, altura = 0.50
+    WHERE idbebe_hospital = 31
+
+    COMMIT TRANSACTION
+    PRINT 'Transação de atendimento concluída com sucesso.'
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    PRINT 'Erro na transação de atendimento. Transação desfeita.'
+END CATCH
+
+1 - Registrar Atendimento de um Bebê
+Esta transação registra o atendimento de um bebê por um médico e enfermeiro, garantindo que ambas as operações sejam realizadas de forma atômica.
+
+
+BEGIN TRANSACTION
+
+BEGIN TRY
+    -- Remover relacionamentos na tabela possui
+    DELETE FROM possui
+    WHERE idbebe_hospital = 31
+
+    -- Remover bebê da tabela bebe
+    DELETE FROM bebe
+    WHERE idbebe_hospital = 31
+
+    COMMIT TRANSACTION
+    PRINT 'Transação de exclusão de bebê concluída com sucesso.'
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    PRINT 'Erro na transação de exclusão de bebê. Transação desfeita.'
+END CATCH
+ 
+2 - Excluir Bebê e Relacionamentos
+Esta transação exclui um bebê da tabela bebe e remove os relacionamentos associados na tabela possui.
+
+
+BEGIN TRANSACTION
+
+BEGIN TRY
+    -- Inserir novo hospital
+    INSERT INTO hospital (cnpj, nome, endereco) 
+    VALUES (98765432000123, 'Hospital Novo', 'Rua Nova, 123')
+
+    -- Transferir bebês do hospital antigo para o novo
+    UPDATE bebe
+    SET idbebe_hospital = 98765432000123
+    WHERE idbebe_hospital = 05184998000145
+
+    COMMIT TRANSACTION
+    PRINT 'Transação de adição de hospital e transferência de bebês concluída com sucesso.'
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    PRINT 'Erro na transação de adição de hospital e transferência de bebês. Transação desfeita.'
+END CATCH
+
+3 - Adicionar um Novo Hospital e Transferir Bebês para o Novo Hospital
+Esta transação adiciona um novo hospital à tabela hospital e transfere todos os bebês de um hospital antigo para o novo hospital.
+
+
+BEGIN TRANSACTION
+
+BEGIN TRY
+    -- Atualizar dados do bebê
+    UPDATE bebe
+    SET peso = 3.60, altura = 0.52
+    WHERE idbebe_hospital = 31
+
+    -- Inserir novo atendimento
+    INSERT INTO atendido (crm, cofen, idbebe_hospital)
+    VALUES (123457, 789013, 31)
+
+    COMMIT TRANSACTION
+    PRINT 'Transação de atualização de bebê e registro de atendimento concluída com sucesso.'
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    PRINT 'Erro na transação de atualização de bebê e registro de atendimento. Transação desfeita.'
+END CATCH
+
+4 - Atualizar Dados do Bebê e Registrar Atendimento Simultaneamente
+Esta transação atualiza os dados de um bebê e registra um novo atendimento para o mesmo bebê.
+
+
+BEGIN TRANSACTION
+
+BEGIN TRY
+    -- Inserir novo médico
+    INSERT INTO medico (nome, crm)
+    VALUES ('Dr. João', 654321)
+
+    -- Registrar atendimento do novo médico
+    INSERT INTO atendido (crm, cofen, idbebe_hospital)
+    VALUES (654321, 789012, 31)
+
+    COMMIT TRANSACTION
+    PRINT 'Transação de inserção de médico e registro de atendimento concluída com sucesso.'
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    PRINT 'Erro na transação de inserção de médico e registro de atendimento. Transação desfeita.'
+END CATCH
+
+5 - Inserir um Novo Médico e Registrar um Atendimento
+Esta transação insere um novo médico na tabela medico e registra um atendimento desse médico a um bebê recém-nascido na tabela atendido.
+
