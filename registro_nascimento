@@ -1,0 +1,79 @@
+create database registro_nascimento;
+
+use registro_nascimento;
+
+CREATE TABLE mae 
+( 
+ nome VARCHAR(255) NOT NULL,  
+ cpf BIGINT NOT NULL,  
+ rg BIGINT NOT NULL,  
+ idmae INT PRIMARY KEY  
+); 
+
+CREATE TABLE medico 
+( 
+ nome VARCHAR(255) NOT NULL,  
+ crm BIGINT PRIMARY KEY  
+);
+ 
+
+CREATE TABLE enfermeiro 
+( 
+ nome VARCHAR(255) NOT NULL,  
+ cofen BIGINT PRIMARY KEY  
+);
+
+CREATE TABLE possui (
+  idpai INT NOT NULL,
+  idmae INT NOT NULL,
+  idbebe_hospital INT NOT NULL
+);
+
+CREATE TABLE atendido 
+( 
+ crm BIGINT NOT NULL,  
+ cofen BIGINT NOT NULL,  
+ idbebe_hospital INT  
+);
+
+CREATE TABLE hospital 
+( 
+ cnpj BIGINT PRIMARY KEY,  
+ nome VARCHAR(255) NOT NULL,  
+ endereco VARCHAR(255) NOT NULL    
+); 
+
+CREATE TABLE bebe 
+( 
+ nome VARCHAR(255) NOT NULL,  
+ peso DECIMAL (10,2) NOT NULL,  
+ altura DECIMAL (2,2) NOT NULL,  
+ data_hora_nascimento DATETIME NOT NULL,  
+ idbebe_hospital INT PRIMARY KEY   
+); 
+
+CREATE TABLE pai 
+( 
+ nome VARCHAR(255) NOT NULL,  
+ cpf BIGINT NOT NULL,  
+ rg BIGINT NOT NULL,  
+ idpai INT PRIMARY KEY  
+);
+
+ALTER TABLE possui ADD FOREIGN KEY(idmae) REFERENCES mae (idmae)
+ALTER TABLE possui ADD FOREIGN KEY(idbebe_hospital) REFERENCES bebe (idbebe_hospital)
+ALTER TABLE possui ADD FOREIGN KEY(idpai) REFERENCES pai (idpai)
+ALTER TABLE atendido ADD FOREIGN KEY(crm) REFERENCES medico (crm)
+ALTER TABLE atendido ADD FOREIGN KEY(cofen) REFERENCES enfermeiro (cofen)
+ALTER TABLE atendido ADD FOREIGN KEY(idbebe_hospital) REFERENCES bebe (idbebe_hospital)
+
+
+INSERT INTO mae (nome, cpf, rg, idmae) VALUES ('cristiane', 05411470056, 158233104, 11);
+INSERT INTO pai (nome, cpf, rg, idpai) VALUES ('claudio', 61498990630, 246602557, 21);
+INSERT INTO medico (nome, crm) VALUES ('flavia', 123456);
+INSERT INTO enfermeiro (nome, cofen) VALUES ('ricardo', 789012);
+INSERT INTO bebe (nome, peso, altura, data_hora_nascimento, idbebe_hospital) VALUES ('enzo', '03.20', '00.49', '2023-11-10 21:00:00', 31);
+INSERT INTO hospital (cnpj, nome, endereco) VALUEs (05184998000145, 'hospital_das_clínicas', 'rua_doutor_ovídio_pires_de_campos');
+INSERT INTO atendido (crm, cofen, idbebe_hospital) VALUES (123456,789012, 31);
+INSERT INTO possui (idpai, idmae, idbebe_hospital) VALUES (21, 11, 31);
+
