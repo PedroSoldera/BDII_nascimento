@@ -1,0 +1,119 @@
+1°
+DECLARE @nome_bebe VARCHAR(255)
+
+DECLARE cursor_nomes_bebes CURSOR FOR
+SELECT nome FROM bebe
+
+OPEN cursor_nomes_bebes
+FETCH NEXT FROM cursor_nomes_bebes INTO @nome_bebe
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT 'Nome do Bebê: ' + @nome_bebe
+    FETCH NEXT FROM cursor_nomes_bebes INTO @nome_bebe
+END
+
+CLOSE cursor_nomes_bebes
+DEALLOCATE cursor_nomes_bebes
+
+Cursor para listar nomes de bebês
+
+
+2°
+DECLARE @idmae INT, @nome_mae VARCHAR(255), @contador_bebes INT
+
+DECLARE cursor_listar_maes_multiplos_bebes CURSOR FOR
+SELECT p.idmae, m.nome, COUNT(p.idbebe_hospital) AS TotalBebes
+FROM possui p
+INNER JOIN mae m ON p.idmae = m.idmae
+GROUP BY p.idmae, m.nome
+HAVING COUNT(p.idbebe_hospital) > 1
+
+OPEN cursor_listar_maes_multiplos_bebes
+FETCH NEXT FROM cursor_listar_maes_multiplos_bebes INTO @idmae, @nome_mae, @contador_bebes
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT 'Mãe: ' + @nome_mae + ' - Total de Bebês: ' + CAST(@contador_bebes AS VARCHAR(10))
+    FETCH NEXT FROM cursor_listar_maes_multiplos_bebes INTO @idmae, @nome_mae, @contador_bebes
+END
+
+CLOSE cursor_listar_maes_multiplos_bebes
+DEALLOCATE cursor_listar_maes_multiplos_bebes
+
+Cursor para listar Mães com mais de um bebê na tabela ‘possui’
+
+3°
+DECLARE @crm_medico BIGINT, @nome_bebe VARCHAR(255)
+
+SET @crm_medico = 123456
+
+DECLARE cursor_bebes_por_medico CURSOR FOR
+SELECT b.nome
+FROM bebe b
+INNER JOIN atendido a ON b.idbebe_hospital = a.idbebe_hospital
+WHERE a.crm = @crm_medico
+
+OPEN cursor_bebes_por_medico
+FETCH NEXT FROM cursor_bebes_por_medico INTO @nome_bebe
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT 'Bebê Atendido pelo Médico: ' + @nome_bebe
+    FETCH NEXT FROM cursor_bebes_por_medico INTO @nome_bebe
+END
+
+CLOSE cursor_bebes_por_medico
+DEALLOCATE cursor_bebes_por_medico
+
+Este cursor lista os bebês atendidos por um médico específico na tabela ‘atendido’
+
+
+4°
+DECLARE @data_referencia DATETIME, @nome_bebe VARCHAR(255)
+
+SET @data_referencia = '2023-01-01'
+
+DECLARE cursor_bebes_nascidos_depois CURSOR FOR
+SELECT nome
+FROM bebe
+WHERE data_hora_nascimento > @data_referencia
+
+OPEN cursor_bebes_nascidos_depois
+FETCH NEXT FROM cursor_bebes_nascidos_depois INTO @nome_bebe
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT 'Bebê Nascido após ' + CONVERT(VARCHAR(10), @data_referencia, 103) + ': ' + @nome_bebe
+    FETCH NEXT FROM cursor_bebes_nascidos_depois INTO @nome_bebe
+END
+
+CLOSE cursor_bebes_nascidos_depois
+DEALLOCATE cursor_bebes_nascidos_depois
+
+Cursor para listar os bebês que nasceram após uma determinada data na tabela ‘bebe’
+
+
+5°
+DECLARE @idpai INT, @nome_pai VARCHAR(255), @idmae INT, @nome_mae VARCHAR(255), @nome_bebe VARCHAR(255)
+
+DECLARE cursor_listar_pais_mae CURSOR FOR
+SELECT p.idpai, pai.nome AS NomePai, p.idmae, mae.nome AS NomeMae, bebe.nome AS NomeBebe
+FROM possui p
+INNER JOIN pai ON p.idpai = pai.idpai
+INNER JOIN mae ON p.idmae = mae.idmae
+INNER JOIN bebe ON p.idbebe_hospital = bebe.idbebe_hospital
+
+OPEN cursor_listar_pais_mae
+FETCH NEXT FROM cursor_listar_pais_mae INTO @idpai, @nome_pai, @idmae, @nome_mae, @nome_bebe
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT 'Bebê: ' + @nome_bebe + ' | Pai: ' + @nome_pai + ' | Mãe: ' + @nome_mae
+    FETCH NEXT FROM cursor_listar_pais_mae INTO @idpai, @nome_pai, @idmae, @nome_mae, @nome_bebe
+END
+
+CLOSE cursor_listar_pais_mae
+DEALLOCATE cursor_listar_pais_mae
+
+Cursor para listar os nomes dos pais e mães dos bebês na tabela ‘possui’
