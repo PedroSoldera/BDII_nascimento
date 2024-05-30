@@ -1,0 +1,99 @@
+1°
+CREATE TRIGGER TriggerAtualizarPesoAltura
+ON bebe
+AFTER UPDATE
+AS
+BEGIN
+    IF UPDATE(peso) OR UPDATE(altura)
+    BEGIN
+        UPDATE b
+        SET b.peso = i.peso, b.altura = i.altura
+        FROM bebe b
+        INNER JOIN inserted i ON b.idbebe_hospital = i.idbebe_hospital
+    END
+END
+
+Atualizar peso e altura do bebê: Esta trigger atualiza automaticamente o registro de peso e altura do bebê sempre que uma alteração é feita na tabela bebê
+
+2°
+CREATE TRIGGER TriggerRemoverAtendimento
+ON bebe
+AFTER DELETE
+AS
+BEGIN
+    DELETE FROM atendido WHERE idbebe_hospital IN (SELECT idbebe_hospital FROM deleted)
+END
+
+Trigger para remover relações de atendimento ao remover um bebê: Este trigger remove automaticamente os registros de atendimento associados a um bebê quando o bebê é removido da tabela ‘bebe’.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3°
+CREATE TRIGGER TriggerImpedirPaiDuplicado
+ON pai
+INSTEAD OF INSERT
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM pai p INNER JOIN inserted i ON p.cpf = i.cpf)
+    BEGIN
+        RAISERROR ('Não é permitido inserir um pai com CPF duplicado.', 16, 1)
+    END
+    ELSE
+    BEGIN
+        INSERT INTO pai (nome, cpf, rg) SELECT nome, cpf, rg FROM inserted
+    END
+END
+Trigger para Impedir Inserção de Pais Duplicados: Este trigger impede a inserção de registros duplicados na tabela pai.
+
+4°
+CREATE TRIGGER TriggerImpedirExclusaoMae
+ON mae
+INSTEAD OF DELETE
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM deleted d INNER JOIN possui p ON d.idmae = p.idmae)
+    BEGIN
+        RAISERROR ('Não é possível excluir uma mãe associada a bebês.', 16, 1)
+    END
+    ELSE
+    BEGIN
+        DELETE FROM mae WHERE idmae IN (SELECT idmae FROM deleted)
+    END
+END
+
+Trigger para Impedir Exclusão de Mães com Bebês Associados: Este trigger impede a exclusão de registros da tabela ‘mae’ que estão associados a bebês na tabela bebe.
+
+5°
+CREATE TRIGGER TriggerImpedirInsercaoNegativa
+ON bebe
+INSTEAD OF INSERT
+AS
+BEGIN
+    IF EXISTS (SELECT * FROM inserted WHERE peso < 0 OR altura < 0)
+    BEGIN
+        RAISERROR ('Não é permitido inserir um bebê com peso ou altura negativos.', 16, 1)
+    END
+    ELSE
+    BEGIN
+        INSERT INTO bebe (nome, peso, altura, data_hora_nascimento, idbebe_hospital) 
+        SELECT nome, peso, altura, data_hora_nascimento, idbebe_hospital FROM inserted
+    END
+END
+Trigger para Impedir a Inserção de Bebês com Peso ou Altura Negativos: Esta trigger impede a inserção de bebês na tabela bebe caso o peso ou altura informados sejam negativos.
+
+
